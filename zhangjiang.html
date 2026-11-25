@@ -1,0 +1,538 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>张江AI创新小镇 - 活动资讯</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <!-- 导航栏 -->
+    <nav class="navbar">
+        <a href="index.html" class="nav-logo">
+            <div class="logo-icon">通</div>
+            <div class="logo-text-wrap">
+                <span class="logo-text">通义大模型生态赋能中心</span>
+                <span class="logo-subtitle">全国首个集技术、运营、场景创新于一体的生态赋能中心</span>
+            </div>
+        </a>
+        <div class="nav-links">
+            <a href="index.html">活动首页</a>
+            <a href="publish.html">发布活动</a>
+            <a href="admin.html">后台管理</a>
+            <a href="qwen.html">关于千问</a>
+        </div>
+    </nav>
+
+    <!-- Hero区域 -->
+    <section class="hero-zhangjiang">
+        <div class="hero-content">
+            <h1>🏙️ 张江AI创新小镇</h1>
+            <p>聚焦人工智能前沿，汇聚创新力量，打造张江AI产业生态高地</p>
+            <div class="zj-stats">
+                <div class="zj-stat-item">
+                    <span class="stat-num" id="statTotal">-</span>
+                    <span class="stat-label">活动总数</span>
+                </div>
+                <div class="zj-stat-item">
+                    <span class="stat-num" id="statActive">-</span>
+                    <span class="stat-label">报名中</span>
+                </div>
+                <div class="zj-stat-item">
+                    <span class="stat-num" id="statEnded">-</span>
+                    <span class="stat-label">已结束</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 工具栏（视图切换 + 筛选） -->
+    <div class="zj-toolbar">
+        <div class="zj-toolbar-inner">
+            <div class="zj-view-tabs">
+                <button class="zj-view-tab active" onclick="switchView('list')">📋 活动列表</button>
+                <button class="zj-view-tab" onclick="switchView('publish')">➕ 发布活动</button>
+                <button class="zj-view-tab" onclick="switchView('admin')">⚙️ 管理后台</button>
+            </div>
+            <div id="filterBar" style="display:flex; gap:10px; align-items:center; margin-left:auto; flex-wrap:wrap;">
+                <input type="text" id="zjSearchInput" class="form-control" placeholder="搜索活动..." style="max-width:200px; padding:7px 12px; font-size:13px;">
+                <select id="zjCategoryFilter" class="form-control" style="max-width:130px; padding:7px 10px; font-size:13px;">
+                    <option value="">全部分类</option>
+                    <option value="技术沙龙">技术沙龙</option>
+                    <option value="行业峰会">行业峰会</option>
+                    <option value="培训课程">培训课程</option>
+                    <option value="工作坊">工作坊</option>
+                    <option value="线上直播">线上直播</option>
+                </select>
+                <select id="zjStatusFilter" class="form-control" style="max-width:110px; padding:7px 10px; font-size:13px;">
+                    <option value="">全部状态</option>
+                    <option value="active">报名中</option>
+                    <option value="ended">已结束</option>
+                </select>
+            </div>
+        </div>
+    </div>
+
+    <!-- 列表视图 -->
+    <div class="container" id="viewList" style="padding:30px 20px;">
+        <div class="events-grid" id="zjEventsGrid"></div>
+        <div class="empty-state" id="zjEmptyState" style="display:none;">
+            <div class="empty-icon">📭</div>
+            <h3>暂无相关活动</h3>
+            <p>试试其他筛选条件，或切换到"发布活动"添加新活动</p>
+        </div>
+    </div>
+
+    <!-- 发布视图 -->
+    <div class="container" id="viewPublish" style="display:none; padding:30px 20px;">
+        <form id="zjPublishForm" class="zj-publish-form">
+            <h2 class="section-title" style="padding-top:0;">发布张江小镇活动</h2>
+            <p style="color:var(--text-light); margin-bottom:24px; font-size:14px;">填写张江AI创新小镇范围内的活动信息</p>
+
+            <div class="form-group">
+                <label>活动名称 <span class="required">*</span></label>
+                <input type="text" class="form-control" id="zjTitle" placeholder="请输入活动名称" required>
+            </div>
+
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px;">
+                <div class="form-group">
+                    <label>活动日期 <span class="required">*</span></label>
+                    <input type="date" class="form-control" id="zjDate" required>
+                </div>
+                <div class="form-group">
+                    <label>活动时间</label>
+                    <input type="time" class="form-control" id="zjTime">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>活动地点 <span class="required">*</span></label>
+                <input type="text" class="form-control" id="zjLocation" placeholder="例如：张江AI创新小镇·路演大厅" required>
+            </div>
+
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px;">
+                <div class="form-group">
+                    <label>活动分类 <span class="required">*</span></label>
+                    <select class="form-control" id="zjCategory" required>
+                        <option value="">请选择分类</option>
+                        <option value="技术沙龙">技术沙龙</option>
+                        <option value="行业峰会">行业峰会</option>
+                        <option value="培训课程">培训课程</option>
+                        <option value="工作坊">工作坊</option>
+                        <option value="线上直播">线上直播</option>
+                        <option value="其他">其他</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>活动状态</label>
+                    <select class="form-control" id="zjStatus">
+                        <option value="active">报名中</option>
+                        <option value="ended">已结束</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>主办方</label>
+                <input type="text" class="form-control" id="zjOrganizer" placeholder="请输入主办方名称" value="张江AI创新小镇">
+            </div>
+
+            <div class="form-group">
+                <label>活动描述 <span class="required">*</span></label>
+                <textarea class="form-control" id="zjDescription" placeholder="请输入活动详细描述、议程安排等信息..." rows="5" required></textarea>
+            </div>
+
+            <!-- 封面上传 -->
+            <div class="form-group">
+                <label>活动封面图</label>
+                <div class="upload-area" onclick="document.getElementById('zjCoverInput').click()">
+                    <div class="upload-icon">🖼️</div>
+                    <p>点击或拖拽上传封面图片</p>
+                    <p style="font-size:12px; color:#9ca3af; margin-top:4px;">支持 JPG、PNG 格式</p>
+                </div>
+                <input type="file" id="zjCoverInput" accept="image/*" style="display:none;" onchange="handleZjCover(this)">
+                <div class="upload-preview" id="zjCoverPreview"></div>
+            </div>
+
+            <div style="display:flex; gap:12px; margin-top:10px;">
+                <button type="submit" class="btn btn-primary" style="flex:1;">发布活动</button>
+                <button type="reset" class="btn btn-outline" onclick="resetZjForm()">重置</button>
+            </div>
+        </form>
+    </div>
+
+    <!-- 管理视图 -->
+    <div class="container" id="viewAdmin" style="display:none; padding:30px 20px;">
+        <div class="zj-admin-section">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+                <h2 class="section-title" style="padding-top:0;">张江活动管理</h2>
+                <span style="font-size:14px; color:var(--text-light);" id="zjAdminCount"></span>
+            </div>
+            <div style="overflow-x:auto;">
+                <table class="admin-table" id="zjAdminTable">
+                    <thead>
+                        <tr>
+                            <th>活动名称</th>
+                            <th>日期</th>
+                            <th>地点</th>
+                            <th>分类</th>
+                            <th>状态</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody id="zjAdminTableBody"></tbody>
+                </table>
+            </div>
+            <div class="empty-state" id="zjAdminEmpty" style="display:none;">
+                <div class="empty-icon">📋</div>
+                <h3>暂无活动数据</h3>
+                <p>切换到"发布活动"视图添加第一个活动</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- 编辑模态框 -->
+    <div class="modal-overlay" id="zjEditModal">
+        <div class="modal">
+            <h2>编辑张江小镇活动</h2>
+            <form id="zjEditForm">
+                <input type="hidden" id="zjEditId">
+                <div class="form-group">
+                    <label>活动名称 <span class="required">*</span></label>
+                    <input type="text" class="form-control" id="zjEditTitle" required>
+                </div>
+                <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px;">
+                    <div class="form-group">
+                        <label>活动日期 <span class="required">*</span></label>
+                        <input type="date" class="form-control" id="zjEditDate" required>
+                    </div>
+                    <div class="form-group">
+                        <label>活动时间</label>
+                        <input type="time" class="form-control" id="zjEditTime">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>活动地点 <span class="required">*</span></label>
+                    <input type="text" class="form-control" id="zjEditLocation" required>
+                </div>
+                <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px;">
+                    <div class="form-group">
+                        <label>活动分类</label>
+                        <select class="form-control" id="zjEditCategory">
+                            <option value="技术沙龙">技术沙龙</option>
+                            <option value="行业峰会">行业峰会</option>
+                            <option value="培训课程">培训课程</option>
+                            <option value="工作坊">工作坊</option>
+                            <option value="线上直播">线上直播</option>
+                            <option value="其他">其他</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>活动状态</label>
+                        <select class="form-control" id="zjEditStatus">
+                            <option value="active">报名中</option>
+                            <option value="ended">已结束</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>主办方</label>
+                    <input type="text" class="form-control" id="zjEditOrganizer">
+                </div>
+                <div class="form-group">
+                    <label>活动描述</label>
+                    <textarea class="form-control" id="zjEditDescription" rows="4"></textarea>
+                </div>
+                <div class="modal-actions">
+                    <button type="button" class="btn btn-outline" onclick="closeZjEditModal()">取消</button>
+                    <button type="submit" class="btn btn-primary">保存修改</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- 删除确认模态框 -->
+    <div class="modal-overlay" id="zjDeleteModal">
+        <div class="modal" style="max-width:400px; text-align:center;">
+            <h2 style="color:#ef4444;">确认删除</h2>
+            <p style="margin:20px 0; color:var(--text-light);">确定要删除活动 "<span id="zjDeleteName"></span>" 吗？</p>
+            <div class="modal-actions" style="justify-content:center;">
+                <button class="btn btn-outline" onclick="closeZjDeleteModal()">取消</button>
+                <button class="btn btn-danger" id="zjConfirmDeleteBtn">确认删除</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 页脚 -->
+    <footer class="footer">
+        <div class="container">
+            <p>© 2026 通义大模型生态赋能中心 | 活动资讯平台</p>
+        </div>
+    </footer>
+
+    <script src="js/app.js"></script>
+    <script>
+        let zjCoverBase64 = '';
+        let currentView = 'list';
+        let zjDeleteTargetId = '';
+
+        // 视图切换
+        function switchView(view) {
+            currentView = view;
+            document.getElementById('viewList').style.display = view === 'list' ? 'block' : 'none';
+            document.getElementById('viewPublish').style.display = view === 'publish' ? 'block' : 'none';
+            document.getElementById('viewAdmin').style.display = view === 'admin' ? 'block' : 'none';
+            document.getElementById('filterBar').style.display = view === 'list' ? 'flex' : 'none';
+
+            document.querySelectorAll('.zj-view-tab').forEach((tab, i) => {
+                tab.classList.toggle('active', ['list', 'publish', 'admin'][i] === view);
+            });
+
+            if (view === 'list') renderZjList();
+            if (view === 'admin') renderZjAdmin();
+        }
+
+        // 更新统计
+        function updateStats() {
+            const all = ZhangjiangManager.getAll();
+            document.getElementById('statTotal').textContent = all.length;
+            document.getElementById('statActive').textContent = all.filter(e => e.status === 'active').length;
+            document.getElementById('statEnded').textContent = all.filter(e => e.status === 'ended').length;
+        }
+
+        // 渲染列表
+        function renderZjList() {
+            const events = ZhangjiangManager.getAll();
+            const keyword = document.getElementById('zjSearchInput').value.trim().toLowerCase();
+            const category = document.getElementById('zjCategoryFilter').value;
+            const status = document.getElementById('zjStatusFilter').value;
+
+            let filtered = events.filter(e => {
+                let match = true;
+                if (keyword) match = match && e.title.toLowerCase().includes(keyword);
+                if (category) match = match && e.category === category;
+                if (status) match = match && e.status === status;
+                return match;
+            });
+
+            const grid = document.getElementById('zjEventsGrid');
+            const emptyState = document.getElementById('zjEmptyState');
+
+            if (filtered.length === 0) {
+                grid.innerHTML = '';
+                emptyState.style.display = 'block';
+                return;
+            }
+
+            emptyState.style.display = 'none';
+            grid.innerHTML = filtered.map(event => `
+                <div class="card event-card" onclick="openZjDetail('${event.id}')">
+                    <div class="card-img">
+                        ${event.cover
+                            ? `<img src="${event.cover}" alt="${event.title}">`
+                            : `<span>${Utils.getCategoryIcon(event.category)}</span>`
+                        }
+                    </div>
+                    <div class="card-body">
+                        <h3>${event.title}</h3>
+                        <div class="card-meta">
+                            <span>📅 ${event.date} ${event.time || ''}</span>
+                            <span>📍 ${event.location}</span>
+                            <span>👤 ${event.organizer || '张江AI创新小镇'}</span>
+                        </div>
+                    </div>
+                    <div class="card-footer">
+                        <span class="tag">${event.category || '其他'}</span>
+                        <span class="status ${event.status === 'active' ? 'status-active' : 'status-ended'}">
+                            ${Utils.getStatusText(event.status)}
+                        </span>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // 查看详情（弹出模态框）
+        function openZjDetail(id) {
+            const event = ZhangjiangManager.getById(id);
+            if (!event) return;
+            const overlay = document.createElement('div');
+            overlay.className = 'modal-overlay active';
+            overlay.onclick = function(e) { if (e.target === this) this.remove(); };
+            overlay.innerHTML = `
+                <div class="modal" style="max-width:700px;">
+                    <h2>${event.title}</h2>
+                    <div style="display:flex; flex-wrap:wrap; gap:14px; font-size:14px; color:var(--text-light); margin:16px 0;">
+                        <span>📅 ${event.date} ${event.time || ''}</span>
+                        <span>📍 ${event.location}</span>
+                        <span>🏷️ ${event.category}</span>
+                        <span>👤 ${event.organizer || '张江AI创新小镇'}</span>
+                        <span style="color:${event.status === 'active' ? '#10b981' : '#9ca3af'};">${Utils.getStatusText(event.status)}</span>
+                    </div>
+                    ${event.cover ? `<img src="${event.cover}" style="width:100%;max-height:300px;object-fit:cover;border-radius:8px;margin-bottom:16px;">` : ''}
+                    <div style="white-space:pre-wrap; line-height:1.8; color:#374151; font-size:15px;">${event.description || '暂无描述'}</div>
+                    <div class="modal-actions">
+                        <button class="btn btn-outline" onclick="this.closest('.modal-overlay').remove()">关闭</button>
+                        ${event.status === 'active' ? '<button class="btn btn-primary" onclick="Utils.showToast(\'报名成功！\');this.closest(\'.modal-overlay\').remove()">立即报名</button>' : ''}
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(overlay);
+        }
+
+        // 渲染管理表格
+        function renderZjAdmin() {
+            const events = ZhangjiangManager.getAll();
+            const tbody = document.getElementById('zjAdminTableBody');
+            const emptyEl = document.getElementById('zjAdminEmpty');
+            document.getElementById('zjAdminCount').textContent = `共 ${events.length} 个活动`;
+
+            if (events.length === 0) {
+                document.getElementById('zjAdminTable').style.display = 'none';
+                emptyEl.style.display = 'block';
+                return;
+            }
+            document.getElementById('zjAdminTable').style.display = 'table';
+            emptyEl.style.display = 'none';
+
+            tbody.innerHTML = events.map(event => `
+                <tr>
+                    <td style="max-width:220px;">
+                        <strong style="display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${event.title}</strong>
+                        <small style="color:var(--text-light);">${event.organizer || ''}</small>
+                    </td>
+                    <td>${event.date}</td>
+                    <td>${event.location}</td>
+                    <td><span class="tag">${event.category || '其他'}</span></td>
+                    <td><span class="status ${event.status === 'active' ? 'status-active' : 'status-ended'}">${Utils.getStatusText(event.status)}</span></td>
+                    <td>
+                        <div class="actions">
+                            <button class="btn btn-outline btn-sm" onclick="openZjEditModal('${event.id}')">编辑</button>
+                            <button class="btn btn-danger btn-sm" onclick="openZjDeleteModal('${event.id}','${event.title.replace(/'/g, "\\'")}')">删除</button>
+                        </div>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        // 封面上传
+        async function handleZjCover(input) {
+            const file = input.files[0];
+            if (!file) return;
+            zjCoverBase64 = await Utils.compressImage(file, { maxSize: 1280, quality: 0.7 });
+            document.getElementById('zjCoverPreview').innerHTML = `
+                <div class="preview-item">
+                    <img src="${zjCoverBase64}" alt="封面">
+                    <button class="remove-btn" onclick="zjCoverBase64='';this.parentElement.remove();">×</button>
+                </div>`;
+        }
+
+        // 重置表单
+        function resetZjForm() {
+            zjCoverBase64 = '';
+            document.getElementById('zjCoverPreview').innerHTML = '';
+        }
+
+        // 发布表单提交
+        document.getElementById('zjPublishForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const data = {
+                title: document.getElementById('zjTitle').value.trim(),
+                date: document.getElementById('zjDate').value,
+                time: document.getElementById('zjTime').value,
+                location: document.getElementById('zjLocation').value.trim(),
+                category: document.getElementById('zjCategory').value,
+                status: document.getElementById('zjStatus').value,
+                organizer: document.getElementById('zjOrganizer').value.trim(),
+                description: document.getElementById('zjDescription').value.trim(),
+                cover: zjCoverBase64,
+                images: []
+            };
+            if (!data.title || !data.date || !data.location || !data.category || !data.description) {
+                Utils.showToast('请填写所有必填项', 'error');
+                return;
+            }
+            const result = ZhangjiangManager.add(data);
+            if (!result.success) { Utils.showToast(result.message || '发布失败', 'error'); return; }
+            Utils.showToast('活动发布成功！');
+            this.reset();
+            resetZjForm();
+            document.getElementById('zjOrganizer').value = '张江AI创新小镇';
+            updateStats();
+            setTimeout(() => switchView('list'), 800);
+        });
+
+        // 编辑模态框
+        function openZjEditModal(id) {
+            const event = ZhangjiangManager.getById(id);
+            if (!event) return;
+            document.getElementById('zjEditId').value = id;
+            document.getElementById('zjEditTitle').value = event.title;
+            document.getElementById('zjEditDate').value = event.date;
+            document.getElementById('zjEditTime').value = event.time || '';
+            document.getElementById('zjEditLocation').value = event.location;
+            document.getElementById('zjEditCategory').value = event.category || '其他';
+            document.getElementById('zjEditStatus').value = event.status;
+            document.getElementById('zjEditOrganizer').value = event.organizer || '';
+            document.getElementById('zjEditDescription').value = event.description || '';
+            document.getElementById('zjEditModal').classList.add('active');
+        }
+
+        function closeZjEditModal() {
+            document.getElementById('zjEditModal').classList.remove('active');
+        }
+
+        document.getElementById('zjEditForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const id = document.getElementById('zjEditId').value;
+            const result = ZhangjiangManager.update(id, {
+                title: document.getElementById('zjEditTitle').value.trim(),
+                date: document.getElementById('zjEditDate').value,
+                time: document.getElementById('zjEditTime').value,
+                location: document.getElementById('zjEditLocation').value.trim(),
+                category: document.getElementById('zjEditCategory').value,
+                status: document.getElementById('zjEditStatus').value,
+                organizer: document.getElementById('zjEditOrganizer').value.trim(),
+                description: document.getElementById('zjEditDescription').value.trim()
+            });
+            if (!result.success) { Utils.showToast(result.message || '保存失败', 'error'); return; }
+            closeZjEditModal();
+            renderZjAdmin();
+            updateStats();
+            Utils.showToast('活动已更新！');
+        });
+
+        // 删除
+        function openZjDeleteModal(id, name) {
+            zjDeleteTargetId = id;
+            document.getElementById('zjDeleteName').textContent = name;
+            document.getElementById('zjDeleteModal').classList.add('active');
+        }
+        function closeZjDeleteModal() {
+            document.getElementById('zjDeleteModal').classList.remove('active');
+            zjDeleteTargetId = '';
+        }
+        document.getElementById('zjConfirmDeleteBtn').addEventListener('click', function() {
+            if (zjDeleteTargetId) {
+                ZhangjiangManager.delete(zjDeleteTargetId);
+                closeZjDeleteModal();
+                renderZjAdmin();
+                updateStats();
+                Utils.showToast('活动已删除');
+            }
+        });
+
+        // 关闭模态框
+        document.getElementById('zjEditModal').addEventListener('click', function(e) { if (e.target === this) closeZjEditModal(); });
+        document.getElementById('zjDeleteModal').addEventListener('click', function(e) { if (e.target === this) closeZjDeleteModal(); });
+
+        // 筛选监听
+        document.getElementById('zjSearchInput').addEventListener('input', renderZjList);
+        document.getElementById('zjCategoryFilter').addEventListener('change', renderZjList);
+        document.getElementById('zjStatusFilter').addEventListener('change', renderZjList);
+
+        // 初始化
+        updateStats();
+        renderZjList();
+    </script>
+</body>
+</html>
